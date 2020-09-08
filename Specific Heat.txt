@@ -4,7 +4,7 @@ class Main {
   public static void main(String[] args) {
     Scanner reader = new Scanner(System.in);
     System.out.println("Enter mass of water in grams:");
-    double m = reader.nextDouble();
+    double mass = reader.nextDouble();
     System.out.println("Enter initial temperature of water in Celcius:");
     double i = reader.nextDouble();
     if (i<-273.14){
@@ -13,7 +13,6 @@ class Main {
     double f = reader.nextDouble();
     if (f<-273.14){
       f = -273.14;}
-
     String initialPhase = "liquid";
     if (i < 0)
       initialPhase = "solid";
@@ -24,18 +23,35 @@ class Main {
       endPhase = "solid";
     if (f > 100)
       endPhase = "gas";
+    System.out.println("Mass: " + mass + "g");
+    System.out.println("Initial tempeature: " + i + "C " + initialPhase);
+    System.out.println("Final tempeature: " + f + "C " + endPhase);
     boolean endothermic = true;
     if (f > i)
-      endothermic = false;
-    System.out.println("Mass: " + mass + "g");
-    System.out.println("Initial tempeature: " + initialTemp + "C " + initialPhase);
-    System.out.println("Final tempeature: " + finalTemp + "C " + finalPhase);
-  } 
+      endothermic = true;
+    double heatEnergy = 0;
 
+    if (initialPhase.equals("solid")){
+      heatEnergy += tempChangeSolid(mass, i, f, endPhase, endothermic);
+    }
+    if (!endPhase.equals("solid")){
+      heatEnergy += fusion(mass, endothermic);
+      heatEnergy += tempChangeliquid(mass, 0, f, endPhase, endothermic);
+    }
+    if (endPhase.equals("gas")){
+      heatEnergy += vaporization(mass, endothermic);
+      heatEnergy += tempChangeVapor(mass, 100, f, endPhase, endothermic);
+    }
+
+
+    heatEnergy = round(heatEnergy);
+    System.out.println("Total heat energy " + heatEnergy + " kJ");
+
+  }
   public static double tempChangeSolid(double mass, double i, double f, String endPhase, boolean endothermic){
     if (!endPhase.equals("solid"))
       f = 0;
-   double energychange = round(mass*0.00218*(f-i));
+   double energychange = round(mass*0.002108*(f-i));
     if (endothermic)
       System.out.println("Heating (solid): " + energychange + "kJ");
     else
@@ -73,7 +89,7 @@ class Main {
      energychange = round(0.333 * mass); 
      System.out.println("Melting: " + energychange + "kJ");}
    else {
-     energychange = round(0.333 * mass);
+     energychange = round(-0.333 * mass);
    System.out.println("Freezing: " + energychange + "kJ");}
    return energychange; 
   }
